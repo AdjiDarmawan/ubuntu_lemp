@@ -1,0 +1,7 @@
+---
+# Server Profile
+path_file_uploaded: "/var/www/myweb/public_html"
+php-version: php7.2
+path_php_ini: "/etc/php/7.2/fpm"
+path_www_directory: "/etc/php/7.2/fpm/pool.d"
+listen_value: "127.0.0.1:9000"

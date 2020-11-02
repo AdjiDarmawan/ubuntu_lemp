@@ -1,0 +1,56 @@
+---
+- name: 1. Check Lock dpkg
+  file:
+    state: absent
+    path: "{{ item }}"
+  become: true
+  with_items:
+    - /var/lib/dpkg/lock-frontend
+    - /var/lib/dpkg/lock
+  tags: apt
+
+- name: 2. Install php-fpm packages
+  apt:
+    name:
+      - php7.2
+      - php7.2-fpm
+      - php7.2-mysql
+      - php7.2-curl
+      - php7.2-common
+      - php7.2-mbstring
+      - php7.2-gd
+      - php7.2-xml
+      - php7.2-cli
+      - php7.2-json
+    state: present
+  tags:
+    - install_php_packeges
+
+- name: 3. Testing Nginx Server Is Running
+  template:
+    src: templates/index.php.j2
+    dest: "{{ path_file_uploaded }}/index.php"
+  tags:
+    - upload_file
+
+# - name: 4. PHP-FPM Config (php.ini)
+#   template:
+#     src: templates/php.ini.j2
+#     dest: "{{ path_php_ini }}/php.ini"
+#   tags:
+#     - config_php_fpm
+
+- name: 5. PHP-FPM Config
+  copy:
+    src: templates/www.conf.j2
+    dest: /etc/php/7.2/fpm/pool.d/www.conf
+  tags:
+    - config_php_fpm
+
+- name: 6. Restarting PHP-FPM
+  service:
+    name: php7.2-fpm
+    enabled: yes
+    state: started
+  tags:
+    - starting_php-fpm_service

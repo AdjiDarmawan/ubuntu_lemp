@@ -1,0 +1,7 @@
+#Server Identification
+host_name: "web-nginx2"
+host_ip: "<fill_ip_address>"
+
+#Direcory Places
+dest_myhosts_file: /etc
+ntp_configuration_path: /etc/ntp

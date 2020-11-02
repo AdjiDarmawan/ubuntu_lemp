@@ -1,0 +1,15 @@
+---
+# Server Profile
+ubuntu_version_name: "bionic"
+nginx_server: "<fill_ip_address>"
+
+# nginx packages
+nginx_sourcelink_packages: "http://nginx.org/packages/mainline/ubuntu/"
+nginx_signing_url: "http://nginx.org/keys/nginx_signing.key"
+nginx_repository_path: "/etc/apt/sources.list.d"
+
+# nginx directories
+nginx_directory: "/etc/nginx"
+nginx_serverblock: "/etc/nginx/conf.d"
+nginx_webroot_directory: "/var/www/myweb/public_html"
+nginx_weblog_directory: "/var/log/myweb"

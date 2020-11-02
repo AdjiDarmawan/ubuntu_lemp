@@ -1,0 +1,79 @@
+---
+- name: 0. Remove apt lock file
+  file:
+    state: absent
+    path: "{{ item }}"
+  become: true
+  with_items:
+    - /var/lib/dpkg/lock-frontend
+    - /var/lib/dpkg/lock
+  tags: apt
+
+- name: 1. Update apt Packages
+  apt:
+    update_cache: yes
+  tags:
+    - update_packages
+
+- name: 2. Changes Hostname
+  hostname:
+    name: "{{ host_name }}"
+  tags:
+    - change_hostname
+
+- name: 3. Change FQDN Name
+  template:
+    src: templates/hosts.j2
+    dest: "{{ dest_myhosts_file }}/hosts"
+  tags:
+    - change_hostname
+
+- name: 4. Setting Timezone Server
+  shell: timedatectl set-timezone Asia/Jakarta
+  tags:
+    - set_timezone
+
+- name: 5. Remove apt lock file
+  file:
+    state: absent
+    path: "{{ item }}"
+  become: true
+  with_items:
+    - /var/lib/dpkg/lock-frontend
+    - /var/lib/dpkg/lock
+  tags: apt
+
+- name: 6. install NTP Server
+  apt:
+    name: ntp
+    state: present
+    update_cache: yes
+  register: apt_status
+  tags:
+    - set_timezone
+
+- name: 7. Configure NTP Server
+  template:
+    src: templates/ntp.conf.j2
+    dest: /etc/ntp.conf
+  notify: Restarting NTP Server
+  tags:
+    - set_timezone
+
+- name: 8. Starting NTP Services
+  service:
+    name: ntp
+    enabled: yes
+    state: started
+  tags:
+    - starting_ntp_service
+
+- name: 9. Install Supporting packages
+  apt:
+    name:
+      - jq
+      - curl
+      - wget
+    state: latest
+  tags:
+    - install_packages

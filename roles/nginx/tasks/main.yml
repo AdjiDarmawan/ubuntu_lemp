@@ -1,0 +1,75 @@
+---
+- name: 1. Open Port HTTP/HTTPS
+  ufw:
+    rule: allow
+    port: 80,443
+    proto: tcp
+  tags:
+    - open_ports
+
+- name: 2. Enable Service Port
+  ufw:
+    state: enabled
+    policy: allow
+  tags:
+  - enable_service
+
+- name: 3. Create Server Block Directory
+  file:
+    path: "{{ item }}"
+    mode: 775
+    state: directory
+  with_items:
+    - "{{ nginx_webroot_directory }}"
+    - "{{ nginx_weblog_directory }}"
+  tags:
+    - create_directories
+
+- name: 4. Update Nginx Repository
+  template:
+    src: "templates/nginx.list.j2"
+    dest: "{{ nginx_repository_path }}/nginx.list"
+  tags:
+    - nginx_repository
+
+- name: 5. Get And Import nginx_signing_key
+  apt_key:
+    url: "{{ nginx_signing_url }}"
+    state: present
+  tags:
+    - get_signig_key
+
+- name: 6. Update Packages
+  apt:
+    update_cache: yes
+  tags:
+    - update_packages
+
+- name: 7. Installing Nginx (Latest Version)
+  apt:
+    name: nginx
+    state: present
+  tags:
+    - installing_nginx
+
+- name: 8. Create Nginx Server Block
+  template:
+    src: templates/nginx.conf.j2
+    dest: "{{ nginx_directory }}/nginx.conf"
+  tags:
+    - nginx_configuration
+
+- name: 9. Nginx Server Configurarions
+  template:
+    src: templates/myweb.conf.j2
+    dest: "{{ nginx_serverblock }}/myweb.conf"
+  tags:
+    - configure_nginx_server
+
+- name: 10. Starting Nginx Services
+  service:
+    name: nginx
+    enabled: yes
+    state: started
+  tags:
+    - starting_nginx_service

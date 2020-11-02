@@ -1,0 +1,10 @@
+---
+- name: Restaring Nginx Server
+  service: 
+    name: nginx.service 
+    state: restarted
+
+- name: Restarting php-fpm Service
+  service:
+    name: php7.2-fpm
+    statte: restarted
